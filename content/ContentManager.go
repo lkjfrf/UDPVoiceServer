@@ -2,6 +2,7 @@ package content
 
 import (
 	"encoding/json"
+	"log"
 
 	"net"
 	"sync"
@@ -134,7 +135,7 @@ func (cm *ContentManager) ChannelEnter(conn *net.UDPConn, addr *net.UDPAddr, jso
 	}
 	data := S_ChannelEnter{}
 	json.Unmarshal([]byte(jsonstr), &data)
-
+	log.Println(data.Id)
 	//cm.Channel.Store(data.Id, &Player{conn: conn, Channel: data.ChannelNum})
 	GetSession().NewPlayer(data.Id, conn, addr, data.ChannelNum)
 

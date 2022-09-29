@@ -58,10 +58,11 @@ func (gs *GlobalSession) BroadCastToSameChannelExpetMe(id string, recvpkt any, p
 	if p, ok := gs.GSession.Load(id); ok {
 		TargetChannel = p.(*Player).Channel
 	}
+	sendBuffer := MakeSendBuffer(pkttype, recvpkt)
+
 	gs.GSession.Range(func(key, value any) bool {
 		//if value.(*Player).Channel == TargetChannel && key != id {
 		if value.(*Player).Channel == TargetChannel {
-			sendBuffer := MakeSendBuffer(pkttype, recvpkt)
 			gs.SendByte(value.(*Player).Conn, value.(*Player).Addr, sendBuffer)
 		}
 		return true
