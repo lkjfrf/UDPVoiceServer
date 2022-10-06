@@ -124,7 +124,7 @@ func (cm *ContentManager) Init() {
 	cm.HandlerFunc = make(map[int]func(*net.UDPConn, *net.UDPAddr, string), 0)
 
 	cm.HandlerFunc[ChannelEnter] = cm.ChannelEnter
-	cm.HandlerFunc[EScreenShare] = cm.ScreenShare
+	cm.HandlerFunc[Voice] = cm.Voice
 }
 
 func (cm *ContentManager) ChannelEnter(conn *net.UDPConn, addr *net.UDPAddr, jsonstr string) {
@@ -151,18 +151,17 @@ func (cm *ContentManager) ChannelEnter(conn *net.UDPConn, addr *net.UDPAddr, jso
 	// GetSession().SendPacketByConn(conn, addr, packet, NormalChat)
 }
 
-func (cm *ContentManager) ScreenShare(conn *net.UDPConn, addr *net.UDPAddr, jsonstr string) {
-	type SR_ScreenShare struct {
-		Id     string
-		Data   []uint16
-		Status int32
-		Size   int32
-		Width  int32
-		Height int32
+func (cm *ContentManager) Voice(conn *net.UDPConn, addr *net.UDPAddr, jsonstr string) {
+	type SR_Voice struct {
+		Id          string
+		VoiceData   []uint16
+		Numchannels int32
+		SampleRate  int32
+		PCMSize     int32
+		Volume      float32
 	}
-	data := SR_ScreenShare{}
+	data := SR_Voice{}
 	json.Unmarshal([]byte(jsonstr), &data)
 
-	//GetSession().BroadCastToSameChannelExpetMeByte(conn, []byte(jsonstr), EScreenShare)
-	GetSession().BroadCastToSameChannelExpetMe(data.Id, data, EScreenShare)
+	GetSession().BroadCastToSameChannelExpetMe(data.Id, data, Voice)
 }

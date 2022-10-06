@@ -9,7 +9,7 @@ import (
 
 func main() {
 	core.GetLogManager().SetLogFile()
-	core.GetNetworkCore().Init(":8005")
+	core.GetNetworkCore().Init(":8000")
 	content.GetContentManager().Init()
 	log.Println("VoiceServerStart")
 	for {
