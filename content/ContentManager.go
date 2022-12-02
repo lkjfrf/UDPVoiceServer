@@ -125,6 +125,9 @@ func (cm *ContentManager) Init() {
 
 	cm.HandlerFunc[ChannelEnter] = cm.ChannelEnter
 	cm.HandlerFunc[Voice] = cm.Voice
+	cm.HandlerFunc[PlayerLogout] = cm.PlayerLogout
+	cm.HandlerFunc[HeartBeat] = cm.HeartBeat
+
 }
 
 func (cm *ContentManager) ChannelEnter(conn *net.UDPConn, addr *net.UDPAddr, jsonstr string) {
@@ -135,20 +138,17 @@ func (cm *ContentManager) ChannelEnter(conn *net.UDPConn, addr *net.UDPAddr, jso
 	}
 	data := S_ChannelEnter{}
 	json.Unmarshal([]byte(jsonstr), &data)
-	log.Println(data.Id)
+	log.Println(data.Id, " has channel enter,", data.ChannelNum)
 	//cm.Channel.Store(data.Id, &Player{conn: conn, Channel: data.ChannelNum})
 	GetSession().NewPlayer(data.Id, conn, addr, data.ChannelNum)
 
-	// type R_NormalChat struct {
-	// 	Name    string
-	// 	Team    string
-	// 	Grade   string
-	// 	Message string
+	// type R_Error struct {
+	// 	Status int32
 	// }
 
-	// packet := R_NormalChat{}
-	// packet.Name = "test"
-	// GetSession().SendPacketByConn(conn, addr, packet, NormalChat)
+	//packet := R_Error{Status: 1}
+	//log.Println("SendPacketTest ", conn, addr)
+	//GetSession().SendPacketByConn(conn, addr, packet, Error)
 }
 
 func (cm *ContentManager) Voice(conn *net.UDPConn, addr *net.UDPAddr, jsonstr string) {
@@ -162,6 +162,22 @@ func (cm *ContentManager) Voice(conn *net.UDPConn, addr *net.UDPAddr, jsonstr st
 	}
 	data := SR_Voice{}
 	json.Unmarshal([]byte(jsonstr), &data)
+	log.Println(data.Id)
 
 	GetSession().BroadCastToSameChannelExpetMe(data.Id, data, Voice)
+}
+
+func (cm *ContentManager) PlayerLogout(conn *net.UDPConn, addr *net.UDPAddr, jsonstr string) {
+	type S_PlayerLogout struct {
+		Id string
+	}
+	data := S_PlayerLogout{}
+	json.Unmarshal([]byte(jsonstr), &data)
+
+	GetSession().GSession.Delete(data.Id)
+	log.Println(data.Id, " Log out")
+}
+
+func (cm *ContentManager) HeartBeat(conn *net.UDPConn, addr *net.UDPAddr, jsonstr string) {
+	log.Println(jsonstr)
 }

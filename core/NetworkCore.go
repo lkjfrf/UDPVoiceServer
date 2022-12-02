@@ -2,7 +2,6 @@ package core
 
 import (
 	"encoding/binary"
-	"fmt"
 	"log"
 	"net"
 	"sync"
@@ -41,7 +40,6 @@ func (nc *NetworkCore) Connect(port string) {
 	if err != nil {
 		log.Println(err)
 	}
-	fmt.Println("listening on ", port)
 
 	conn, err := net.ListenUDP("udp", ServerAddr)
 	if err != nil {
@@ -60,16 +58,20 @@ func (nc *NetworkCore) Recv(conn *net.UDPConn) {
 		data := make([]byte, 64*1024)
 
 		n, addr, err := conn.ReadFromUDP(data)
+		if err != nil {
+			log.Println(err)
+			break
+		}
 
 		if n > 0 && err == nil {
 			pktsize, pktid := nc.ParseHeader(data)
-			//log.Println("RecvPacket : ", pktid, "/", pktsize)
+			//log.Println("RecvPacket : ", addr, " - ", "pktid : ", pktid)
 
 			if pktsize > 4 {
-				recv := data[4:pktsize]
+				data = data[4:pktsize]
 
 				if content.GetContentManager().HandlerFunc[(int)(pktid)] != nil {
-					content.GetContentManager().HandlerFunc[(int)(pktid)](conn, addr, string(recv))
+					content.GetContentManager().HandlerFunc[(int)(pktid)](conn, addr, string(data))
 				}
 			}
 

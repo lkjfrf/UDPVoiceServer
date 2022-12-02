@@ -41,6 +41,7 @@ func (gs *GlobalSession) NewPlayer(id string, c *net.UDPConn, addr *net.UDPAddr,
 	Con_player.Channel = channelNum
 	Con_player.Addr = addr
 	gs.GSession.Store(id, Con_player)
+	log.Println("New Plyaer", addr, "/", c)
 }
 
 // func (gs *GlobalSession) BroadCastToSameChannelNumExpetMe(ChannelNum int32, Id string, recvpkt any, pkttype uint16) {
@@ -64,6 +65,7 @@ func (gs *GlobalSession) BroadCastToSameChannelExpetMe(id string, recvpkt any, p
 		//if value.(*Player).Channel == TargetChannel && key != id {
 		if value.(*Player).Channel == TargetChannel {
 			gs.SendByte(value.(*Player).Conn, value.(*Player).Addr, sendBuffer)
+			//log.Println(id, "Is Sending to : ", value.(*Player).Id, "/con:", value.(*Player).Conn.RemoteAddr().String(), "/addr:", value.(*Player).Addr)
 		}
 		return true
 	})
